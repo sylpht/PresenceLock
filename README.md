@@ -8,6 +8,8 @@ PresenceLock is a macOS menu bar app that uses the camera to distinguish steppin
 
 **Beta 0.2.8** requires macOS 14 or later. The downloadable build is for Apple silicon. Menus, settings, camera prompts, and reports are available in English and Russian. macOS selects the language from your app or system preferences. English is the fallback.
 
+![How PresenceLock works. The camera starts after 8 seconds without input. After 20 seconds of absence, a 5-second warning starts. A fresh frame must confirm absence before a lock is requested.](docs/images/how-presencelock-works.png)
+
 ## Install and try
 
 1. Download `PresenceLock-0.2.8.zip` and its `.sha256` file from [GitHub Releases](https://github.com/sylpht/PresenceLock/releases/tag/v0.2.8).
@@ -25,6 +27,8 @@ To update, quit the previous version from its menu and replace the app in **Appl
 - **Enable Auto-Lock…** turns on real lock requests for this app session. First set macOS to require a password immediately after the screen saver starts or the display turns off, then test the full walk-away and return flow on your Mac. [Apple’s password settings guide](https://support.apple.com/guide/mac-help/mchlp2270/mac)
 
 By default, the camera starts after **8 seconds** without input. A **5-second** warning follows **20 seconds** of detected absence. A fresh frame must confirm absence at the end of the warning. Input, renewed presence, and uncertainty cancel the countdown. Use **Configure Timing…** to change the defaults.
+
+<img src="docs/images/auto-lock-warning.png" width="620" alt="PresenceLock Auto-Lock warning at five seconds, with I’m Here and Pause for 30 Minutes buttons">
 
 The report compares an additional on-device Apple Vision pose check against the main detector during Learning and Shadow modes. The main detector drives real lock requests. Camera visibility, posture, and lighting affect detection. PresenceLock detects people in view. macOS handles authentication and unlocking.
 

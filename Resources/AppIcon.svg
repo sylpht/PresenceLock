@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <title>PresenceLock App Icon</title>
+  <rect x="64" y="64" width="896" height="896" rx="218" fill="#101820"/>
+  <path d="M512 176c-91 70-184 112-280 140v186c0 162 102 273 280 332 178-59 280-170 280-332V316c-96-28-189-70-280-140Z"
+        fill="none" stroke="#F4F7F7" stroke-width="66" stroke-linejoin="round"/>
+  <path d="M628 412a158 158 0 1 1-232 0"
+        fill="none" stroke="#18E299" stroke-width="66" stroke-linecap="round"/>
+  <circle cx="512" cy="542" r="56" fill="#18E299"/>
+</svg>

@@ -31,7 +31,7 @@ final class ScreenLockExecutor {
                 } else if app != nil {
                     finish(.requested)
                 } else {
-                    finish(.failed("macOS не подтвердила запуск заставки"))
+                    finish(.failed(L10n.text("macOS не подтвердила запуск заставки")))
                 }
             }
             return
@@ -44,7 +44,7 @@ final class ScreenLockExecutor {
             if task.terminationReason == .exit && task.terminationStatus == 0 {
                 finish(.requested)
             } else {
-                finish(.failed("Команда выключения дисплея завершилась с кодом \(task.terminationStatus)"))
+                finish(.failed(L10n.format("Команда выключения дисплея завершилась с кодом %1$d", task.terminationStatus)))
             }
         }
         do {

@@ -35,11 +35,11 @@ final class WarningPanelController: NSObject {
         self.performsRealLock = performsRealLock
         self.deadlineMonotonic = deadlineMonotonic
         titleLabel.stringValue = performsRealLock
-            ? "Похоже, вы отошли"
-            : "Проверка PresenceLock"
+            ? L10n.text("Похоже, вы отошли")
+            : L10n.text("Проверка PresenceLock")
         explanationLabel.stringValue = performsRealLock
-            ? "Нажмите «Я здесь» или просто используйте клавиатуру, мышь или трекпад."
-            : "Это прогноз. Можно продолжать работу — PresenceLock сам завершит проверку."
+            ? L10n.text("Нажмите «Я здесь» или просто используйте клавиатуру, мышь или трекпад.")
+            : L10n.text("Это прогноз. Можно продолжать работу — PresenceLock сам завершит проверку.")
         updateCountdown()
         panel.center()
         panel.orderFrontRegardless()
@@ -78,11 +78,11 @@ final class WarningPanelController: NSObject {
         explanationLabel.textColor = .secondaryLabelColor
         explanationLabel.alignment = .center
 
-        let presentButton = NSButton(title: "Я здесь", target: self, action: #selector(confirmPresent))
+        let presentButton = NSButton(title: L10n.text("Я здесь"), target: self, action: #selector(confirmPresent))
         presentButton.keyEquivalent = "\r"
         presentButton.bezelStyle = .rounded
         let pauseButton = NSButton(
-            title: "Пауза на 30 минут",
+            title: L10n.text("Пауза на 30 минут"),
             target: self,
             action: #selector(pauseThirtyMinutes)
         )
@@ -112,10 +112,10 @@ final class WarningPanelController: NSObject {
         if remaining > 0 {
             let seconds = Int(ceil(remaining))
             countdownLabel.font = countdownFont
-            countdownLabel.stringValue = performsRealLock ? "\(seconds)" : "\(seconds) с"
+            countdownLabel.stringValue = performsRealLock ? "\(seconds)" : L10n.format("%1$@ с", String(seconds))
         } else {
             countdownLabel.font = checkingFont
-            countdownLabel.stringValue = "Проверяю свежий кадр…"
+            countdownLabel.stringValue = L10n.text("Проверяю свежий кадр…")
             timer?.invalidate()
             timer = nil
         }

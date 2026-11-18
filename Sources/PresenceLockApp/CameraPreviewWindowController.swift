@@ -3,9 +3,9 @@ import AVFoundation
 import PresenceLockCore
 
 final class CameraPreviewWindowController: NSWindowController, NSWindowDelegate {
-    private let statusLabel = NSTextField(wrappingLabelWithString: "Ожидание камеры")
+    private let statusLabel = NSTextField(wrappingLabelWithString: L10n.text("Ожидание камеры"))
     private let preview = CameraPreviewView(frame: .zero)
-    private var statusText = "Ожидание камеры"
+    private var statusText = L10n.text("Ожидание камеры")
 
     var onClose: (() -> Void)?
     var isVisible: Bool { window?.isVisible == true }
@@ -19,7 +19,7 @@ final class CameraPreviewWindowController: NSWindowController, NSWindowDelegate 
             backing: .buffered,
             defer: false
         )
-        window.title = "Как видит PresenceLock"
+        window.title = L10n.text("Как видит PresenceLock")
         window.contentMinSize = NSSize(width: 310, height: 260)
         window.isReleasedWhenClosed = false
         super.init(window: window)
@@ -45,7 +45,7 @@ final class CameraPreviewWindowController: NSWindowController, NSWindowDelegate 
 
     func refreshVideoStatus() {
         let message = isVisible && preview.hasActiveVideo
-            ? "\(statusText) · Видеопоток активен"
+            ? L10n.format("%1$@ · Видеопоток активен", statusText)
             : statusText
         if statusLabel.stringValue != message { statusLabel.stringValue = message }
     }
@@ -54,17 +54,17 @@ final class CameraPreviewWindowController: NSWindowController, NSWindowDelegate 
         guard isVisible else { return }
         switch frame.observation {
         case .present:
-            statusText = "Человек виден"
+            statusText = L10n.text("Человек виден")
         case .absent:
-            statusText = "Человек не обнаружен"
+            statusText = L10n.text("Человек не обнаружен")
         case .unknown:
             switch frame.quality {
             case .usable:
-                statusText = "По этому кадру определить не удалось"
+                statusText = L10n.text("По этому кадру определить не удалось")
             case .rejected:
-                statusText = "Кадр слишком тёмный, яркий или однотонный"
+                statusText = L10n.text("Кадр слишком тёмный, яркий или однотонный")
             case .analysisFailed:
-                statusText = "Не удалось обработать кадр"
+                statusText = L10n.text("Не удалось обработать кадр")
             }
         }
         preview.lastObservation = frame
@@ -73,7 +73,7 @@ final class CameraPreviewWindowController: NSWindowController, NSWindowDelegate 
     }
 
     func windowWillClose(_ notification: Notification) {
-        setWaiting("Ожидание камеры")
+        setWaiting(L10n.text("Ожидание камеры"))
         onClose?()
     }
 
@@ -84,8 +84,8 @@ final class CameraPreviewWindowController: NSWindowController, NSWindowDelegate 
         statusLabel.setContentCompressionResistancePriority(.required, for: .vertical)
 
         let legend = NSStackView(views: [
-            Self.legendLabel("Лицо", color: CameraPreviewView.faceColor),
-            Self.legendLabel("Верх тела", color: CameraPreviewView.bodyColor)
+            Self.legendLabel(L10n.text("Лицо"), color: CameraPreviewView.faceColor),
+            Self.legendLabel(L10n.text("Верх тела"), color: CameraPreviewView.bodyColor)
         ])
         legend.orientation = .horizontal
         legend.spacing = 16

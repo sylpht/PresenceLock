@@ -67,6 +67,10 @@ for status_icon_name in "${status_icon_names[@]}"; do
     cp "${status_icon_path}" "${app_dir}/Contents/Resources/${status_icon_name}"
   fi
 done
+for localization in "${project_dir}/Resources/"*.lproj; do
+  plutil -lint "${localization}"/*.strings >/dev/null
+  cp -R "${localization}" "${app_dir}/Contents/Resources/"
+done
 chmod 755 "${app_dir}/Contents/MacOS/PresenceLock"
 
 bundle_id="$(plutil -extract CFBundleIdentifier raw "${app_dir}/Contents/Info.plist")"
@@ -102,6 +106,9 @@ for status_icon_name in "${status_icon_names[@]}"; do
   if [[ -f "${status_icon_path}" ]]; then
     [[ -f "${verification_root}/PresenceLock.app/Contents/Resources/${status_icon_name}" ]]
   fi
+done
+for localization in "${project_dir}/Resources/"*.lproj; do
+  diff -rq "${localization}" "${verification_root}/PresenceLock.app/Contents/Resources/${localization:t}"
 done
 
 archive_name="${archive_path:t}"

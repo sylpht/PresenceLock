@@ -7,7 +7,7 @@ final class PresenceLockSettingsWindowController: NSWindowController {
     private let probeField = NSTextField()
     private let absenceField = NSTextField()
     private let warningField = NSTextField()
-    private let validationLabel = NSTextField(labelWithString: "")
+    private let validationLabel = NSTextField(wrappingLabelWithString: "")
 
     init(
         preferences: PresenceLockPreferences,
@@ -21,7 +21,7 @@ final class PresenceLockSettingsWindowController: NSWindowController {
             backing: .buffered,
             defer: false
         )
-        window.title = "Настройки PresenceLock"
+        window.title = L10n.text("Настройки PresenceLock")
         window.isReleasedWhenClosed = false
         super.init(window: window)
         buildInterface()
@@ -42,11 +42,10 @@ final class PresenceLockSettingsWindowController: NSWindowController {
 
     private func buildInterface() {
         guard let contentView = window?.contentView else { return }
-        let title = NSTextField(labelWithString: "Когда считать, что вы отошли")
+        let title = NSTextField(labelWithString: L10n.text("Когда считать, что вы отошли"))
         title.font = .systemFont(ofSize: 18, weight: .semibold)
         let note = NSTextField(wrappingLabelWithString:
-            "Настройки применяются сразу и сбрасывают текущий отсчёт. "
-            + "Боевой режим всё равно нужно включать отдельно после каждого запуска."
+            L10n.text("Настройки применяются сразу и сбрасывают текущий отсчёт. Боевой режим всё равно нужно включать отдельно после каждого запуска.")
         )
         note.textColor = .secondaryLabelColor
 
@@ -56,12 +55,12 @@ final class PresenceLockSettingsWindowController: NSWindowController {
             $0.widthAnchor.constraint(equalToConstant: 92).isActive = true
         }
         let form = NSGridView(views: [
-            [NSTextField(labelWithString: "Включать камеру после"), probeField,
-             NSTextField(labelWithString: "секунд без ввода")],
-            [NSTextField(labelWithString: "Подтверждать отсутствие"), absenceField,
-             NSTextField(labelWithString: "секунд")],
-            [NSTextField(labelWithString: "Показывать предупреждение"), warningField,
-             NSTextField(labelWithString: "секунд")]
+            [NSTextField(labelWithString: L10n.text("Включать камеру после")), probeField,
+             NSTextField(labelWithString: L10n.text("секунд без ввода"))],
+            [NSTextField(labelWithString: L10n.text("Подтверждать отсутствие")), absenceField,
+             NSTextField(labelWithString: L10n.text("секунд"))],
+            [NSTextField(labelWithString: L10n.text("Показывать предупреждение")), warningField,
+             NSTextField(labelWithString: L10n.text("секунд"))]
         ])
         form.rowSpacing = 10
         form.columnSpacing = 8
@@ -70,9 +69,9 @@ final class PresenceLockSettingsWindowController: NSWindowController {
         validationLabel.textColor = .systemRed
         validationLabel.isHidden = true
 
-        let resetButton = NSButton(title: "По умолчанию", target: self, action: #selector(resetDefaults))
-        let cancelButton = NSButton(title: "Отмена", target: self, action: #selector(cancel))
-        let saveButton = NSButton(title: "Сохранить", target: self, action: #selector(save))
+        let resetButton = NSButton(title: L10n.text("По умолчанию"), target: self, action: #selector(resetDefaults))
+        let cancelButton = NSButton(title: L10n.text("Отмена"), target: self, action: #selector(cancel))
+        let saveButton = NSButton(title: L10n.text("Сохранить"), target: self, action: #selector(save))
         saveButton.keyEquivalent = "\r"
         let spacer = NSView()
         spacer.setContentHuggingPriority(.defaultLow, for: .horizontal)
@@ -116,7 +115,7 @@ final class PresenceLockSettingsWindowController: NSWindowController {
               (5...300).contains(absence),
               (3...60).contains(warning) else {
             validationLabel.stringValue =
-                "Допустимо: камера 5–300 с, отсутствие 5–300 с, предупреждение 3–60 с."
+                L10n.text("Допустимо: камера 5–300 с, отсутствие 5–300 с, предупреждение 3–60 с.")
             validationLabel.isHidden = false
             NSSound.beep()
             return

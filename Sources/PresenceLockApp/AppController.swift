@@ -69,26 +69,26 @@ final class AppController: NSObject, NSMenuDelegate {
     private var latestLockRequest: UUID?
     private var journalGeneration = UUID()
     private var reportInFlight: UUID?
-    private var statusMessage = "Мониторинг не запущен"
+    private var statusMessage = L10n.text("Мониторинг не запущен")
 
     private let statusMenuItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
     private let detailMenuItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
     private let lockErrorItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
-    private let reportItem = NSMenuItem(title: "Сформировать отчёт", action: nil, keyEquivalent: "")
-    private let toggleMonitoringItem = NSMenuItem(title: "Начать обучение", action: nil, keyEquivalent: "")
-    private let learningModeItem = NSMenuItem(title: "Режим обучения", action: nil, keyEquivalent: "")
-    private let shadowModeItem = NSMenuItem(title: "Теневой режим", action: nil, keyEquivalent: "")
-    private let armedModeItem = NSMenuItem(title: "Боевая блокировка…", action: nil, keyEquivalent: "")
-    private let settingsItem = NSMenuItem(title: "Настроить пороги…", action: nil, keyEquivalent: "")
-    private let launchAtLoginItem = NSMenuItem(title: "Запускать при входе", action: nil, keyEquivalent: "")
-    private let feedbackMenu = NSMenu(title: "Уточнить наблюдение")
+    private let reportItem = NSMenuItem(title: L10n.text("Сформировать отчёт"), action: nil, keyEquivalent: "")
+    private let toggleMonitoringItem = NSMenuItem(title: L10n.text("Начать обучение"), action: nil, keyEquivalent: "")
+    private let learningModeItem = NSMenuItem(title: L10n.text("Режим обучения"), action: nil, keyEquivalent: "")
+    private let shadowModeItem = NSMenuItem(title: L10n.text("Теневой режим"), action: nil, keyEquivalent: "")
+    private let armedModeItem = NSMenuItem(title: L10n.text("Боевая блокировка…"), action: nil, keyEquivalent: "")
+    private let settingsItem = NSMenuItem(title: L10n.text("Настроить пороги…"), action: nil, keyEquivalent: "")
+    private let launchAtLoginItem = NSMenuItem(title: L10n.text("Запускать при входе"), action: nil, keyEquivalent: "")
+    private let feedbackMenu = NSMenu(title: L10n.text("Уточнить наблюдение"))
     private let episodeHeading = NSMenuItem(title: "", action: nil, keyEquivalent: "")
     private let predictionHeading = NSMenuItem(title: "", action: nil, keyEquivalent: "")
-    private let confirmDepartureItem = NSMenuItem(title: "К этому моменту я уже отошёл", action: nil, keyEquivalent: "")
-    private let markFalseAlarmItem = NSMenuItem(title: "В этот момент я был у экрана", action: nil, keyEquivalent: "")
-    private let episodeDepartureItem = NSMenuItem(title: "Я отходил", action: nil, keyEquivalent: "")
-    private let episodePresentItem = NSMenuItem(title: "Всё время был у экрана", action: nil, keyEquivalent: "")
-    private let correctLastFeedbackItem = NSMenuItem(title: "Исправить последнюю метку…", action: nil, keyEquivalent: "")
+    private let confirmDepartureItem = NSMenuItem(title: L10n.text("К этому моменту я уже отошёл"), action: nil, keyEquivalent: "")
+    private let markFalseAlarmItem = NSMenuItem(title: L10n.text("В этот момент я был у экрана"), action: nil, keyEquivalent: "")
+    private let episodeDepartureItem = NSMenuItem(title: L10n.text("Я отходил"), action: nil, keyEquivalent: "")
+    private let episodePresentItem = NSMenuItem(title: L10n.text("Всё время был у экрана"), action: nil, keyEquivalent: "")
+    private let correctLastFeedbackItem = NSMenuItem(title: L10n.text("Исправить последнюю метку…"), action: nil, keyEquivalent: "")
 
     override init() {
         let preferences = PresenceLockPreferences()
@@ -99,24 +99,24 @@ final class AppController: NSObject, NSMenuDelegate {
         super.init()
         monitoringEnabled = preferences.loadMonitoringEnabled() && camera.isAuthorized
         if monitoringEnabled {
-            statusMessage = "Мониторинг восстановлен · режим обучения"
+            statusMessage = L10n.text("Мониторинг восстановлен · режим обучения")
         } else if preferences.loadMonitoringEnabled() {
-            statusMessage = "Мониторинг ждёт доступа к камере"
+            statusMessage = L10n.text("Мониторинг ждёт доступа к камере")
         }
         eventStore = try? JSONLEventStore(directoryURL: Self.dataDirectory())
         if eventStore == nil {
-            storageErrorMessage = "Журнал недоступен"
+            storageErrorMessage = L10n.text("Журнал недоступен")
         }
         do {
             try eventStore?.purgeFiles(olderThanDays: 21)
             restoreLatestFeedback()
         } catch {
-            storageErrorMessage = "Ошибка чтения журнала"
+            storageErrorMessage = L10n.text("Ошибка чтения журнала")
         }
         camera.onHardFailure = { [weak self] in
             self?.cameraRetryAfter = Date().addingTimeInterval(30)
             self?.closeEpisodeForBoundary()
-            self?.resetForBoundary(message: "Камера недоступна")
+            self?.resetForBoundary(message: L10n.text("Камера недоступна"))
         }
         observeWorkspaceBoundaries()
         sessionActive = WorkspaceSessionState.consoleIsUsable
@@ -172,11 +172,11 @@ final class AppController: NSObject, NSMenuDelegate {
             camera.stop()
             warningPanel.hide()
             if !monitoringEnabled {
-                statusMessage = cameraAuthorizationPending ? "Мониторинг ждёт доступа к камере" : "Мониторинг не запущен"
+                statusMessage = cameraAuthorizationPending ? L10n.text("Мониторинг ждёт доступа к камере") : L10n.text("Мониторинг не запущен")
             } else if !sessionActive {
-                statusMessage = "Сессия неактивна"
+                statusMessage = L10n.text("Сессия неактивна")
             } else if let pauseUntil {
-                statusMessage = "Пауза до \(Self.timeFormatter.string(from: pauseUntil))"
+                statusMessage = L10n.format("Пауза до %1$@", Self.timeFormatter.string(from: pauseUntil))
             }
             updateMenu()
             return
@@ -185,7 +185,7 @@ final class AppController: NSObject, NSMenuDelegate {
         guard let idle = idleMonitor.secondsSinceLastInput() else {
             if previousTickUptime != nil { closeEpisodeForBoundary(now: now) }
             camera.stop()
-            resetForBoundary(message: "Нет данных об активности клавиатуры и мыши")
+            resetForBoundary(message: L10n.text("Нет данных об активности клавиатуры и мыши"))
             updateMenu()
             return
         }
@@ -345,7 +345,7 @@ final class AppController: NSObject, NSMenuDelegate {
                         let skippedAt = Date()
                         _ = appendRecord(now: skippedAt, event: "lockSuppressed", lockDecisionID: id)
                         closeEpisodeForBoundary(now: skippedAt)
-                        resetForBoundary(message: "Блокировка отменена · новые данные")
+                        resetForBoundary(message: L10n.text("Блокировка отменена · новые данные"))
                         immediateStatusMessage = statusMessage
                         continue
                     }
@@ -361,7 +361,7 @@ final class AppController: NSObject, NSMenuDelegate {
                         case let .failed(message):
                             event = "lockFailed"
                             if self.latestLockRequest == id {
-                                self.lastLockFailure = "Последний запрос блокировки не выполнен · \(message)"
+                                self.lastLockFailure = L10n.format("Последний запрос блокировки не выполнен · %1$@", message)
                             }
                         }
                         _ = self.appendRecord(now: Date(), event: event, lockDecisionID: id)
@@ -381,7 +381,7 @@ final class AppController: NSObject, NSMenuDelegate {
             statusMessage = immediateStatusMessage
         } else if let retry = cameraRetryAfter, retry > now {
             statusMessage = storageErrorMessage
-                ?? "Камера: повтор в \(max(1, Int(retry.timeIntervalSince(now)))) с"
+                ?? L10n.format("Камера: повтор в %1$ld с", max(1, Int(retry.timeIntervalSince(now))))
         } else {
             statusMessage = storageErrorMessage ?? Self.label(for: stateMachine.state)
         }
@@ -413,7 +413,7 @@ final class AppController: NSObject, NSMenuDelegate {
             preferences.saveMonitoringEnabled(false)
             camera.stop()
             warningPanel.hide()
-            resetForBoundary(message: "Мониторинг остановлен")
+            resetForBoundary(message: L10n.text("Мониторинг остановлен"))
             updateMenu()
             return
         }
@@ -429,7 +429,7 @@ final class AppController: NSObject, NSMenuDelegate {
     private func requestMonitoringAuthorization(openSettingsOnFailure: Bool) {
         guard !cameraAuthorizationPending else { return }
         cameraAuthorizationPending = true
-        statusMessage = "Мониторинг ждёт доступа к камере"
+        statusMessage = L10n.text("Мониторинг ждёт доступа к камере")
         updateMenu()
 
         camera.requestAuthorization { [weak self] granted in
@@ -437,7 +437,7 @@ final class AppController: NSObject, NSMenuDelegate {
             self.cameraAuthorizationPending = false
             self.monitoringEnabled = granted
             self.preferences.saveMonitoringEnabled(granted)
-            self.statusMessage = granted ? "Мониторинг запущен" : "Нет доступа к камере"
+            self.statusMessage = granted ? L10n.text("Мониторинг запущен") : L10n.text("Нет доступа к камере")
             self.previousIdle = nil
             self.previousTickUptime = nil
             self.episodeClosedForCurrentIdle = false
@@ -460,7 +460,7 @@ final class AppController: NSObject, NSMenuDelegate {
         closeEpisodeForBoundary()
         warningPanel.hide()
         _ = stateMachine.setMode(.learning)
-        resetForBoundary(message: "Режим обучения")
+        resetForBoundary(message: L10n.text("Режим обучения"))
         updateMenu()
     }
 
@@ -469,7 +469,7 @@ final class AppController: NSObject, NSMenuDelegate {
         closeEpisodeForBoundary()
         warningPanel.hide()
         _ = stateMachine.setMode(.shadow)
-        resetForBoundary(message: "Теневой режим")
+        resetForBoundary(message: L10n.text("Теневой режим"))
         updateMenu()
     }
 
@@ -480,22 +480,22 @@ final class AppController: NSObject, NSMenuDelegate {
         }
 
         let alert = NSAlert()
-        alert.messageText = "Включить реальную блокировку?"
-        alert.informativeText = "После \(Self.shortDuration(configuration.probeIdleSeconds)) без ввода "
-            + "PresenceLock включит камеру. Если человек не обнаружен \(Self.shortDuration(configuration.absenceConfirmationSeconds)), "
-            + "появится предупреждение на \(Self.shortDuration(configuration.warningSeconds)). "
-            + "Если свежий кадр подтвердит отсутствие, PresenceLock отправит macOS запрос на блокировку.\n\n"
-            + "Перед включением проверьте в системных настройках «Экран блокировки», что пароль запрашивается сразу после запуска заставки "
-            + "или выключения дисплея. Режим действует до завершения PresenceLock."
+        alert.messageText = L10n.text("Включить реальную блокировку?")
+        alert.informativeText = L10n.format(
+            "После %1$@ без ввода PresenceLock включит камеру. Если человек не обнаружен %2$@, появится предупреждение на %3$@. Если свежий кадр подтвердит отсутствие, PresenceLock отправит macOS запрос на блокировку.\n\nПеред включением проверьте в системных настройках «Экран блокировки», что пароль запрашивается сразу после запуска заставки или выключения дисплея. Режим действует до завершения PresenceLock.",
+            Self.shortDuration(configuration.probeIdleSeconds),
+            Self.shortDuration(configuration.absenceConfirmationSeconds),
+            Self.shortDuration(configuration.warningSeconds)
+        )
         alert.alertStyle = .warning
-        alert.addButton(withTitle: "Включить боевой режим")
-        alert.addButton(withTitle: "Отмена")
+        alert.addButton(withTitle: L10n.text("Включить боевой режим"))
+        alert.addButton(withTitle: L10n.text("Отмена"))
         guard alert.runModal() == .alertFirstButtonReturn else { return }
 
         closeEpisodeForBoundary()
         warningPanel.hide()
         _ = stateMachine.setMode(.armed)
-        resetForBoundary(message: "Боевая блокировка включена")
+        resetForBoundary(message: L10n.text("Боевая блокировка включена"))
         updateMenu()
     }
 
@@ -539,22 +539,22 @@ final class AppController: NSObject, NSMenuDelegate {
     private func updateCameraPreviewStatus(now: Date, monotonicNow: TimeInterval) {
         guard let cameraPreview else { return }
         if cameraAuthorizationPending {
-            cameraPreview.setWaiting("Ожидаю разрешения на доступ к камере")
+            cameraPreview.setWaiting(L10n.text("Ожидаю разрешения на доступ к камере"))
         } else if !monitoringEnabled {
-            cameraPreview.setWaiting("Включите мониторинг в меню щита PresenceLock")
+            cameraPreview.setWaiting(L10n.text("Включите мониторинг в меню щита PresenceLock"))
         } else if !sessionActive {
-            cameraPreview.setWaiting("Камера выключена, пока сессия Mac неактивна")
+            cameraPreview.setWaiting(L10n.text("Камера выключена, пока сессия Mac неактивна"))
         } else if let pauseUntil, pauseUntil > now {
-            cameraPreview.setWaiting("Мониторинг на паузе")
+            cameraPreview.setWaiting(L10n.text("Мониторинг на паузе"))
         } else if let cameraRetryAfter, cameraRetryAfter > now {
-            cameraPreview.setWaiting("Камера временно недоступна")
+            cameraPreview.setWaiting(L10n.text("Камера временно недоступна"))
         } else if !camera.isRunning {
-            cameraPreview.setWaiting("Камера запускается…")
+            cameraPreview.setWaiting(L10n.text("Камера запускается…"))
         } else if let lastObservation = cameraPreview.lastFrameUptime,
                   monotonicNow - lastObservation <= configuration.maximumSampleAgeSeconds {
             cameraPreview.refreshVideoStatus()
         } else {
-            cameraPreview.setWaiting("Жду результат распознавания…", showVideo: true)
+            cameraPreview.setWaiting(L10n.text("Жду результат распознавания…"), showVideo: true)
         }
     }
 
@@ -576,7 +576,7 @@ final class AppController: NSObject, NSMenuDelegate {
     @objc private func toggleLaunchAtLogin() {
         if LoginItemManager.requiresApproval {
             LoginItemManager.openApprovalSettings()
-            statusMessage = "Открыты настройки автозапуска"
+            statusMessage = L10n.text("Открыты настройки автозапуска")
             updateMenu()
             return
         }
@@ -584,17 +584,17 @@ final class AppController: NSObject, NSMenuDelegate {
         let shouldEnable = !LoginItemManager.isRegistered
         if shouldEnable,
            !Bundle.main.bundleURL.path.hasPrefix("/Applications/") {
-            showError("Сначала переместите PresenceLock.app в папку «Программы». После этого автозапуск можно будет включить.")
+            showError(L10n.text("Сначала переместите PresenceLock.app в папку «Программы». После этого автозапуск можно будет включить."))
             return
         }
 
         do {
             try LoginItemManager.setEnabled(shouldEnable)
             if LoginItemManager.requiresApproval {
-                statusMessage = "Разрешите автозапуск в Настройках системы"
+                statusMessage = L10n.text("Разрешите автозапуск в Настройках системы")
             }
         } catch {
-            showError("Не удалось изменить автозапуск: \(error.localizedDescription)")
+            showError(L10n.format("Не удалось изменить автозапуск: %1$@", error.localizedDescription))
         }
         updateMenu()
     }
@@ -607,7 +607,7 @@ final class AppController: NSObject, NSMenuDelegate {
         }
         warningPanel.hide()
         cameraRetryAfter = nil
-        statusMessage = "Вы здесь"
+        statusMessage = L10n.text("Вы здесь")
         updateMenu()
     }
 
@@ -631,8 +631,8 @@ final class AppController: NSObject, NSMenuDelegate {
         quietEpisodeHasObservedStart = false
         currentReading = .unknown()
         statusMessage = wasArmed
-            ? "Пороги обновлены · боевая блокировка выключена"
-            : "Пороги обновлены"
+            ? L10n.text("Пороги обновлены · боевая блокировка выключена")
+            : L10n.text("Пороги обновлены")
         updateMenu()
     }
 
@@ -641,7 +641,7 @@ final class AppController: NSObject, NSMenuDelegate {
         pauseUntil = Date().addingTimeInterval(30 * 60)
         camera.stop()
         warningPanel.hide()
-        resetForBoundary(message: "Мониторинг приостановлен")
+        resetForBoundary(message: L10n.text("Мониторинг приостановлен"))
         updateMenu()
     }
 
@@ -650,7 +650,7 @@ final class AppController: NSObject, NSMenuDelegate {
         closeEpisodeForBoundary()
         pauseUntil = nil
         cameraRetryAfter = nil
-        resetForBoundary(message: "Мониторинг продолжен")
+        resetForBoundary(message: L10n.text("Мониторинг продолжен"))
         updateMenu()
     }
 
@@ -677,11 +677,11 @@ final class AppController: NSObject, NSMenuDelegate {
     @objc private func correctLastFeedback() {
         guard let lastFeedbackAction else { return }
         let alert = NSAlert()
-        alert.messageText = "Исправить последнюю метку?"
-        alert.informativeText = "Текущая метка будет заменена противоположной. В журнале сохранится история исправления."
+        alert.messageText = L10n.text("Исправить последнюю метку?")
+        alert.informativeText = L10n.text("Текущая метка будет заменена противоположной. В журнале сохранится история исправления.")
         alert.alertStyle = .warning
-        alert.addButton(withTitle: "Исправить")
-        alert.addButton(withTitle: "Отмена")
+        alert.addButton(withTitle: L10n.text("Исправить"))
+        alert.addButton(withTitle: L10n.text("Отмена"))
         guard alert.runModal() == .alertFirstButtonReturn else { return }
 
         switch lastFeedbackAction.kind {
@@ -703,14 +703,14 @@ final class AppController: NSObject, NSMenuDelegate {
         let generation = journalGeneration
         let settings = configuration
         reportInFlight = generation
-        reportItem.title = "Готовлю отчёт…"
+        reportItem.title = L10n.text("Готовлю отчёт…")
         reportItem.isEnabled = false
         DispatchQueue.global(qos: .utility).async { [weak self] in
             let result = Result { try LearningReport.make(store: eventStore, configuration: settings) }
             DispatchQueue.main.async { [weak self] in
                 guard let self, self.reportInFlight == generation else { return }
                 self.reportInFlight = nil
-                self.reportItem.title = "Сформировать отчёт"
+                self.reportItem.title = L10n.text("Сформировать отчёт")
                 self.reportItem.isEnabled = true
                 do {
                     let url = eventStore.directoryURL.appendingPathComponent("learning-summary.md")
@@ -718,7 +718,7 @@ final class AppController: NSObject, NSMenuDelegate {
                     try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: url.path)
                     NSWorkspace.shared.activateFileViewerSelecting([url])
                 } catch {
-                    self.showError("Не удалось сформировать отчёт: \(error.localizedDescription)")
+                    self.showError(L10n.format("Не удалось сформировать отчёт: %1$@", error.localizedDescription))
                 }
             }
         }
@@ -726,17 +726,17 @@ final class AppController: NSObject, NSMenuDelegate {
 
     @objc private func deleteAllData() {
         let alert = NSAlert()
-        alert.messageText = "Удалить все локальные данные обучения?"
-        alert.informativeText = "Удаление необратимо. Кадров и нажатий клавиш в журнале нет."
+        alert.messageText = L10n.text("Удалить все локальные данные обучения?")
+        alert.informativeText = L10n.text("Удаление необратимо. Кадров и нажатий клавиш в журнале нет.")
         alert.alertStyle = .warning
-        alert.addButton(withTitle: "Удалить")
-        alert.addButton(withTitle: "Отмена")
+        alert.addButton(withTitle: L10n.text("Удалить"))
+        alert.addButton(withTitle: L10n.text("Отмена"))
         guard alert.runModal() == .alertFirstButtonReturn else { return }
 
         do {
             journalGeneration = UUID()
             reportInFlight = nil
-            reportItem.title = "Сформировать отчёт"
+            reportItem.title = L10n.text("Сформировать отчёт")
             reportItem.isEnabled = true
             latestLockRequest = nil
             lastLockFailure = nil
@@ -750,7 +750,7 @@ final class AppController: NSObject, NSMenuDelegate {
             lastFeedbackAction = nil
             updateMenu()
         } catch {
-            showError("Не удалось удалить данные: \(error.localizedDescription)")
+            showError(L10n.format("Не удалось удалить данные: %1$@", error.localizedDescription))
         }
     }
 
@@ -788,7 +788,7 @@ final class AppController: NSObject, NSMenuDelegate {
         toggleMonitoringItem.action = #selector(toggleMonitoring)
         menu.addItem(toggleMonitoringItem)
         let cameraPreviewItem = NSMenuItem(
-            title: "Проверить камеру…",
+            title: L10n.text("Проверить камеру…"),
             action: #selector(openCameraPreview),
             keyEquivalent: ""
         )
@@ -813,10 +813,10 @@ final class AppController: NSObject, NSMenuDelegate {
         menu.addItem(settingsItem)
         menu.addItem(launchAtLoginItem)
 
-        let pause = NSMenuItem(title: "Пауза на 30 минут", action: #selector(pauseThirtyMinutes), keyEquivalent: "")
+        let pause = NSMenuItem(title: L10n.text("Пауза на 30 минут"), action: #selector(pauseThirtyMinutes), keyEquivalent: "")
         pause.target = self
         menu.addItem(pause)
-        let resume = NSMenuItem(title: "Продолжить сейчас", action: #selector(resumeNow), keyEquivalent: "")
+        let resume = NSMenuItem(title: L10n.text("Продолжить сейчас"), action: #selector(resumeNow), keyEquivalent: "")
         resume.target = self
         menu.addItem(resume)
         menu.addItem(.separator())
@@ -850,15 +850,15 @@ final class AppController: NSObject, NSMenuDelegate {
         reportItem.action = #selector(exportSummary)
         reportItem.target = self
         menu.addItem(reportItem)
-        let folder = NSMenuItem(title: "Открыть папку данных", action: #selector(openDataFolder), keyEquivalent: "")
+        let folder = NSMenuItem(title: L10n.text("Открыть папку данных"), action: #selector(openDataFolder), keyEquivalent: "")
         folder.target = self
         menu.addItem(folder)
-        let delete = NSMenuItem(title: "Удалить все данные…", action: #selector(deleteAllData), keyEquivalent: "")
+        let delete = NSMenuItem(title: L10n.text("Удалить все данные…"), action: #selector(deleteAllData), keyEquivalent: "")
         delete.target = self
         menu.addItem(delete)
         menu.addItem(.separator())
 
-        let quit = NSMenuItem(title: "Завершить PresenceLock", action: #selector(quit), keyEquivalent: "q")
+        let quit = NSMenuItem(title: L10n.text("Завершить PresenceLock"), action: #selector(quit), keyEquivalent: "q")
         quit.target = self
         menu.addItem(quit)
         statusItem.menu = menu
@@ -868,27 +868,28 @@ final class AppController: NSObject, NSMenuDelegate {
         statusMenuItem.title = "PresenceLock · \(statusMessage)"
         lockErrorItem.isHidden = lastLockFailure == nil
         lockErrorItem.title = lastLockFailure ?? ""
-        let idleText = previousIdle.map { "\(Int($0)) с" } ?? "—"
-        detailMenuItem.title = "Без ввода: \(idleText) · Камера: \(camera.isRunning ? "включена" : "выключена")"
+        let idleText = previousIdle.map { L10n.format("%1$ld с", Int($0)) } ?? "—"
+        let cameraState = camera.isRunning ? L10n.text("включена") : L10n.text("выключена")
+        detailMenuItem.title = L10n.format("Без ввода: %1$@ · Камера: %2$@", idleText, cameraState)
         if cameraAuthorizationPending {
-            toggleMonitoringItem.title = "Ожидаю доступ к камере…"
+            toggleMonitoringItem.title = L10n.text("Ожидаю доступ к камере…")
             toggleMonitoringItem.isEnabled = false
         } else {
-            toggleMonitoringItem.title = monitoringEnabled ? "Остановить мониторинг" : "Начать мониторинг"
+            toggleMonitoringItem.title = monitoringEnabled ? L10n.text("Остановить мониторинг") : L10n.text("Начать мониторинг")
             toggleMonitoringItem.isEnabled = true
         }
         learningModeItem.state = stateMachine.mode == .learning ? .on : .off
         shadowModeItem.state = stateMachine.mode == .shadow ? .on : .off
         armedModeItem.state = stateMachine.mode == .armed ? .on : .off
         armedModeItem.title = stateMachine.mode == .armed
-            ? "Выключить боевую блокировку"
-            : "Боевая блокировка…"
+            ? L10n.text("Выключить боевую блокировку")
+            : L10n.text("Боевая блокировка…")
         if LoginItemManager.requiresApproval {
             launchAtLoginItem.state = .mixed
-            launchAtLoginItem.title = "Автозапуск: требуется разрешение…"
+            launchAtLoginItem.title = L10n.text("Автозапуск: требуется разрешение…")
         } else {
             launchAtLoginItem.state = LoginItemManager.isEnabled ? .on : .off
-            launchAtLoginItem.title = "Запускать при входе"
+            launchAtLoginItem.title = L10n.text("Запускать при входе")
         }
         switch stateMachine.state {
         case .presentQuiet, .active:
@@ -906,11 +907,11 @@ final class AppController: NSObject, NSMenuDelegate {
     // A monitoring tick can complete a different episode while the menu is tracking.
     private func updateFeedbackMenu() {
         episodeHeading.title = latestEpisode.map {
-            "Последняя пауза · до \(Self.targetDate($0.target.timestamp)) · \(Self.shortDuration($0.target.idleSeconds))"
-        } ?? "Пока нет завершённых пауз"
+            L10n.format("Последняя пауза · до %1$@ · %2$@", Self.targetDate($0.target.timestamp), Self.shortDuration($0.target.idleSeconds))
+        } ?? L10n.text("Пока нет завершённых пауз")
         predictionHeading.title = latestPrediction.map {
-            "Последний прогноз · \(Self.targetDate($0.target.timestamp))"
-        } ?? "Пока нет прогнозов"
+            L10n.format("Последний прогноз · %1$@", Self.targetDate($0.target.timestamp))
+        } ?? L10n.text("Пока нет прогнозов")
         for item in [episodePresentItem, episodeDepartureItem] {
             item.representedObject = latestEpisode?.target
             item.isEnabled = latestEpisode != nil
@@ -924,8 +925,8 @@ final class AppController: NSObject, NSMenuDelegate {
         confirmDepartureItem.state = latestPrediction?.label == .confirmedDeparture ? .on : .off
         markFalseAlarmItem.state = latestPrediction?.label == .falseAlarm ? .on : .off
         correctLastFeedbackItem.title = lastFeedbackAction.map {
-            "Исправить последнюю отметку · \(Self.targetDate($0.target.timestamp))…"
-        } ?? "Исправить последнюю отметку…"
+            L10n.format("Исправить последнюю отметку · %1$@…", Self.targetDate($0.target.timestamp))
+        } ?? L10n.text("Исправить последнюю отметку…")
         correctLastFeedbackItem.isEnabled = lastFeedbackAction != nil
     }
 
@@ -954,7 +955,7 @@ final class AppController: NSObject, NSMenuDelegate {
         )
         record.lockDecisionID = lockDecisionID
         guard let eventStore else {
-            storageErrorMessage = "Журнал недоступен"
+            storageErrorMessage = L10n.text("Журнал недоступен")
             return false
         }
         do {
@@ -962,7 +963,7 @@ final class AppController: NSObject, NSMenuDelegate {
             storageErrorMessage = nil
             return true
         } catch {
-            storageErrorMessage = "Ошибка записи журнала"
+            storageErrorMessage = L10n.text("Ошибка записи журнала")
             return false
         }
     }
@@ -986,7 +987,7 @@ final class AppController: NSObject, NSMenuDelegate {
             storageErrorMessage = nil
             updateMenu()
         } catch {
-            showError("Не удалось сохранить оценку прогноза.")
+            showError(L10n.text("Не удалось сохранить оценку прогноза."))
         }
     }
 
@@ -1009,7 +1010,7 @@ final class AppController: NSObject, NSMenuDelegate {
             storageErrorMessage = nil
             updateMenu()
         } catch {
-            showError("Не удалось сохранить оценку паузы.")
+            showError(L10n.text("Не удалось сохранить оценку паузы."))
         }
     }
 
@@ -1051,7 +1052,7 @@ final class AppController: NSObject, NSMenuDelegate {
                                                         kind: .episode(feedback.label))
             }
         } catch {
-            storageErrorMessage = "Ошибка чтения журнала"
+            storageErrorMessage = L10n.text("Ошибка чтения журнала")
         }
     }
 
@@ -1084,7 +1085,7 @@ final class AppController: NSObject, NSMenuDelegate {
         } else {
             camera.stop()
         }
-        resetForBoundary(message: active ? "Жду подтверждения присутствия" : "Сессия неактивна")
+        resetForBoundary(message: active ? L10n.text("Жду подтверждения присутствия") : L10n.text("Сессия неактивна"))
         updateMenu()
     }
 
@@ -1134,14 +1135,14 @@ final class AppController: NSObject, NSMenuDelegate {
 
     private static func label(for state: PresenceState) -> String {
         switch state {
-        case .launchGuard: return "Жду подтверждения присутствия"
-        case .active: return "Вы работаете"
-        case .quiet: return "Нет ввода"
-        case .presentQuiet: return "Вы у экрана"
-        case .suspectedAway: return "Проверяю уход"
-        case .warning: return "Прогноз блокировки"
-        case .unknown: return "Присутствие неизвестно"
-        case .triggered: return "Прогноз записан"
+        case .launchGuard: return L10n.text("Жду подтверждения присутствия")
+        case .active: return L10n.text("Вы работаете")
+        case .quiet: return L10n.text("Нет ввода")
+        case .presentQuiet: return L10n.text("Вы у экрана")
+        case .suspectedAway: return L10n.text("Проверяю уход")
+        case .warning: return L10n.text("Прогноз блокировки")
+        case .unknown: return L10n.text("Присутствие неизвестно")
+        case .triggered: return L10n.text("Прогноз записан")
         }
     }
 
@@ -1152,8 +1153,8 @@ final class AppController: NSObject, NSMenuDelegate {
     }()
 
     private static func shortDuration(_ seconds: TimeInterval) -> String {
-        if seconds < 60 { return "\(Int(seconds)) с" }
-        return "\(Int(seconds) / 60) мин \(Int(seconds) % 60) с"
+        if seconds < 60 { return L10n.format("%1$ld с", Int(seconds)) }
+        return L10n.format("%1$ld мин %2$ld с", Int(seconds) / 60, Int(seconds) % 60)
     }
 
     private static func targetDate(_ date: Date) -> String {

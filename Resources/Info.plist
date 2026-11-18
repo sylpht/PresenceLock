@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>ru</string>
+	<string>en</string>
 	<key>CFBundleDisplayName</key>
 	<string>PresenceLock</string>
 	<key>CFBundleExecutable</key>
@@ -27,7 +27,7 @@
 	<key>LSUIElement</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>PresenceLock локально проверяет, находитесь ли вы перед Mac. Кадры не сохраняются и никуда не отправляются.</string>
+	<string>PresenceLock uses your camera to check whether someone is at the Mac. Frames are processed locally and are never saved or sent.</string>
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>NSPrincipalClass</key>

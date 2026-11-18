@@ -1,63 +1,44 @@
 # PresenceLock
 
-<img src="Resources/AppIcon.iconset/icon_128x128.png" width="80" alt="Значок PresenceLock">
+<img src="Resources/AppIcon.iconset/icon_128x128.png" width="80" alt="PresenceLock shield icon">
 
-PresenceLock — утилита в строке меню macOS. Она учитывает присутствие у экрана, чтобы Mac мог блокироваться, когда вы отходите, и оставался доступным, пока вы читаете без клавиатуры и мыши. Камера и обработка изображения работают локально.
+[Русский](README.ru.md) · [Download the beta](https://github.com/sylpht/PresenceLock/releases/tag/v0.2.8)
 
-**Версия 0.2.8 · бета · macOS 14 Sonoma или новее.** Готовый архив собран для Mac с Apple Silicon.
+PresenceLock is a macOS menu bar app that uses the camera to distinguish stepping away from reading or watching the screen without touching the keyboard or mouse. It processes frames on your Mac and can ask macOS to lock the screen after a warning.
 
-## Установка
+**Beta 0.2.8** requires macOS 14 or later. The downloadable build is for Apple silicon. Menus, settings, camera prompts, and reports are available in English and Russian. macOS selects the language from your app or system preferences. English is the fallback.
 
-1. В разделе **Releases** этого репозитория скачайте `PresenceLock-0.2.8.zip`.
-2. Распакуйте архив, перенесите `PresenceLock.app` в папку **Программы** и откройте приложение. В строке меню появится щит.
-3. В меню щита выберите **Начать мониторинг** и разрешите доступ к камере.
-4. Проверьте ракурс через **Проверить камеру…**. В этом окне видео остаётся видимым во время работы с мышью и клавиатурой. После закрытия окна камера снова включается по таймеру бездействия.
+## Install and try
 
-Бета имеет локальную подпись и может вызвать предупреждение Gatekeeper. Если вы доверяете источнику архива, после первой попытки запуска откройте **Системные настройки → Конфиденциальность и безопасность → Всё равно открыть** и подтвердите запуск PresenceLock. Это исключение применяется к конкретному приложению. [Инструкция Apple](https://support.apple.com/ru-ru/102445)
+1. Download `PresenceLock-0.2.8.zip` and its `.sha256` file from [GitHub Releases](https://github.com/sylpht/PresenceLock/releases/tag/v0.2.8).
+2. Unzip the archive, move `PresenceLock.app` to **Applications**, and open it.
+3. Click the shield in the menu bar. Choose **Start Monitoring** and grant camera access. Use **Preview Camera…** to see what the camera detects.
 
-Контрольная сумма поставляется рядом с архивом. Для проверки выполните команду в папке с обоими файлами.
+You can verify the download by running `shasum -a 256 -c PresenceLock-0.2.8.zip.sha256` in the folder containing both files. The beta is ad hoc signed. If Gatekeeper asks for approval and you trust the download, macOS can offer **Open Anyway** under **System Settings → Privacy & Security** after you try to launch it. [Apple’s instructions](https://support.apple.com/en-us/102445)
 
-```sh
-shasum -a 256 -c PresenceLock-0.2.8.zip.sha256
-```
+To update, quit the previous version from its menu and replace the app in **Applications**. macOS may request camera permission again. The app stores statistics separately from the app bundle.
 
-При обновлении завершите работу старой версии через меню щита и замените приложение в **Программах**. Статистика хранится в отдельной папке. Из-за локальной подписи macOS может снова запросить доступ к камере.
+## How it works
 
-## Как пользоваться
+- **Learning Mode** records quiet periods and predicted locks. Choose **Generate Report** to see likely presence, observed absence, and how different timings would have behaved.
+- **Shadow Mode** checks your chosen timings on new observations while recording predicted locks.
+- **Enable Auto-Lock…** turns on real lock requests for this app session. First set macOS to require a password immediately after the screen saver starts or the display turns off, then test the full walk-away and return flow on your Mac. [Apple’s password settings guide](https://support.apple.com/guide/mac-help/mchlp2270/mac)
 
-| Режим | Что происходит |
-| --- | --- |
-| **Режим обучения** | Собирает статистику пауз и записывает прогнозы блокировки. С него начинается каждый запуск приложения. |
-| **Теневой режим** | Прогнозирует блокировку с выбранными порогами. Подходит для проверки порогов на новых наблюдениях. |
-| **Боевая блокировка** | После предупреждения и повторной проверки кадра отправляет macOS запрос на блокировку. Включается вручную на текущий сеанс приложения. |
+By default, the camera starts after **8 seconds** without input. A **5-second** warning follows **20 seconds** of detected absence. A fresh frame must confirm absence at the end of the warning. Input, renewed presence, and uncertainty cancel the countdown. Use **Configure Timing…** to change the defaults.
 
-При обычной работе камера включается через **8 секунд** без ввода. После **20 секунд** подтверждаемого отсутствия появляется предупреждение на **5 секунд**. В конце приложение проверяет свежий кадр. Ввод, обнаруженное присутствие или неопределённые показания камеры прерывают отсчёт. Все три числа можно изменить через **Настроить пороги…**.
+The report compares an additional on-device Apple Vision pose check against the main detector during Learning and Shadow modes. The main detector drives real lock requests. Camera visibility, posture, and lighting affect detection. PresenceLock detects people in view. macOS handles authentication and unlocking.
 
-Дайте приложению понаблюдать за обычной работой и выберите **Сформировать отчёт**. В отчёте видны паузы, когда вы, вероятно, оставались у экрана, прогнозы блокировки и сравнение порогов. Длительность паузы считается от последнего ввода. Неясные эпизоды учитываются отдельно. Разметка добровольна. При желании отметьте конкретную ошибку через **Уточнить наблюдение**.
+## Privacy
 
-Если подбираете пороги, проверьте их в теневом режиме на новых наблюдениях. До включения боевого режима в настройках экрана блокировки macOS установите немедленный запрос пароля после заставки или выключения дисплея. Включив режим через меню щита, проверьте на своём Mac полный сценарий ухода и возврата. В журнале фиксируется ответ системы на запрос, а требование аутентификации видно на экране блокировки.
+Camera frames are processed in memory. The app stores only timing, coarse camera observations, decision events, and optional feedback in `~/Library/Application Support/PresenceLock`. Use **Open Data Folder** or **Delete All Data…** in the menu to manage them.
 
-**Запускать при входе** добавляет приложение к объектам входа macOS. Если мониторинг был включён, он возобновится в режиме обучения. Изменение порогов в боевом режиме переключает приложение в теневой режим.
+## Build from source
 
-## Эксперимент с распознаванием позы
-
-Apple Vision локально ищет признаки позы в части кадров, в которых основной детектор предполагает отсутствие человека. В обучении и теневом режиме результаты попадают в отчёт, где сравниваются прогнозы двух вариантов на одних и тех же записях. Реальные блокировки используют основной детектор. Модель поставляется в составе macOS.
-
-## Конфиденциальность и ограничения
-
-- Кадры обрабатываются на Mac в памяти. Журнал хранит только время, длительность пауз, сводные показания камеры, события алгоритма и необязательные отметки пользователя.
-- Данные лежат в `~/Library/Application Support/PresenceLock`. В меню щита можно открыть эту папку или удалить все данные. При запуске приложение удаляет журналы старше 21 дня.
-- Камера учитывает присутствие любого человека в кадре. Надёжность зависит от ракурса, освещения и положения человека. Разблокировку и проверку личности выполняет macOS.
-
-## Сборка из исходников
-
-Требуются macOS 14 или новее и инструменты разработчика Apple со Swift 5.10 или новее. Команды запускаются из корня проекта.
+Use macOS 14 or later with Apple's developer tools and Swift 5.10 or later.
 
 ```sh
 swift run --jobs 1 --scratch-path /tmp/presencelock-checks PresenceLockCoreChecks
 ./scripts/build-app.sh
 ```
 
-Скрипт собирает приложение для архитектуры текущего Mac, применяет локальную подпись и записывает проверенный ZIP и его SHA-256 в `build/`. Для обычной установки загруженной сборки через Gatekeeper потребуются подпись Developer ID и нотарификация Apple.
-
-См. [историю изменений](CHANGELOG.md).
+The build script creates a verified ZIP and SHA-256 file in `build/` for the host Mac's architecture. See the [change history](CHANGELOG.md) for this release.

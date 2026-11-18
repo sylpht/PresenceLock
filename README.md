@@ -28,6 +28,10 @@ To update, quit the previous version from its menu and replace the app in **Appl
 
 By default, the camera starts after **8 seconds** without input. A **5-second** warning follows **20 seconds** of detected absence. A fresh frame must confirm absence at the end of the warning. Input, renewed presence, and uncertainty cancel the countdown. Use **Configure Timing…** to change the defaults.
 
+![Animated Auto-Lock demo. A person leaves the desk, a warning counts down from five to one, and macOS locks after a fresh camera check.](docs/images/auto-lock-demo.gif)
+
+*The 20-second absence check is shortened in this illustrated demo.*
+
 <img src="docs/images/auto-lock-warning.png" width="620" alt="PresenceLock Auto-Lock warning at five seconds, with I’m Here and Pause for 30 Minutes buttons">
 
 The report compares an additional on-device Apple Vision pose check against the main detector during Learning and Shadow modes. The main detector drives real lock requests. Camera visibility, posture, and lighting affect detection. PresenceLock detects people in view. macOS handles authentication and unlocking.
